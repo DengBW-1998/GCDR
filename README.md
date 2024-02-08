@@ -1,0 +1,28 @@
+# BDP
+
+This repository contains the demo code of the paper: 
+
+> GCDR: Graph Contrastive learning adversarial Defense algorithm for Recommendation
+
+If you have any question or you find any bug about codes, please contact me at wy727100600@163.com
+
+
+## Environment settings
+
+- python==3.6.13
+- numpy==1.19.2
+- deeprobust==0.2.4
+- pytorch==1.10.1
+- tensorflow==2.6.0
+- gensim==3.8.3
+
+
+## Basic Usage
+
+**Usage**
+
+If you want to run GCDR or LightGCL:
+- run main.py
+
+If you want to run other baselines:
+- run Baseline.py

@@ -27,7 +27,6 @@ def parse_args():
     parser.add_argument('--note', default=None, type=str, help='note')
     parser.add_argument('--lambda1', default=0.2, type=float, help='weight of cl loss')
     parser.add_argument('--epoch', default=100, type=int, help='number of epochs')
-    #默认epoch为100
     parser.add_argument('--d', default=64, type=int, help='embedding size')
     parser.add_argument('--q', default=5, type=int, help='rank')
     parser.add_argument('--gnn_layer', default=2, type=int, help='number of gnn layers')
@@ -43,6 +42,7 @@ simFunc = 'jac'
 aug_rate=0.0005 #ar
 flip_rate=20/100
 
+#You can change hypers here
 args.data='yelp' #yelp gowalla amazon
 attack='HA' #no rnd DICE HA
 rndInit = False #False in Full Model

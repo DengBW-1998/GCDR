@@ -4,9 +4,6 @@ This repository contains the demo code of the paper:
 
 > GCDR: Graph Contrastive learning adversarial Defense algorithm for Recommendation
 
-If you have any question or you find any bug about codes, please contact me at wy727100600@163.com
-
-
 ## Environment settings
 
 - python==3.6.13

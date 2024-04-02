@@ -19,7 +19,7 @@ This repository contains the demo code of the paper:
 **Usage**
 
 If you want to run GCDR or LightGCL:
-- run main.py
+- python main.py
 
 If you want to run other baselines:
-- run Baseline.py
+- python Baseline.py

@@ -47,7 +47,7 @@ args.data='yelp' #yelp gowalla amazon
 attack='HA' #no rnd DICE HA
 rndInit = False #False in Full Model
 aug=True #True in Full Model
-step1_rate=1.0 #sr, 0.1 in Full Model, 1.0 in Ablation Model
+step1_rate=0.1 #sr, 0.1 in Full Model, 1.0 in Ablation Model
 
 data_file = open("result_yelp.txt",'w+')
 

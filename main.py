@@ -2,12 +2,10 @@ import numpy as np
 import torch
 import pickle
 from model import LightGCL
-from utils import metrics, scipy_sparse_mat_to_torch_sparse_tensor
-#import pandas as pd
-#from parser import args
 from tqdm import tqdm
 import time
 import torch.utils.data as data
+from codes.utils import *
 from utils import *
 import time
 import argparse
@@ -38,11 +36,10 @@ def parse_args():
     return parser.parse_args()
 args = parse_args()
 
-simFunc = 'jac'
+simFunc = 'euc'
 aug_rate=0.0005 #ar
 flip_rate=20/100
 
-#You can change hypers here
 args.data='yelp' #yelp gowalla amazon
 attack='HA' #no rnd DICE HA
 rndInit = False #False in Full Model
@@ -257,7 +254,7 @@ if step1_rate!=1.0:
     del model
     del optimizer
     #print(rep_u[:20],file=data_file)
-    train,emb_u,emb_v = GCNSimDefense(rep_u, rep_v, u, v, ori_train_csr, thx=thx, thj=thj, simFunc='jac')
+    train,emb_u,emb_v = GCNSimDefense(rep_u, rep_v, u, v, ori_train_csr, thx=thx, thj=thj, simFunc=simFunc)
     #print(sum(sum(train)))
     train_Bu = train[:u,u:]
     train = sp.coo_matrix(train_Bu)
@@ -411,3 +408,5 @@ print("aug")
 print(aug)
 print("attack")
 print(attack)
+print("simFunc")
+print(simFunc)

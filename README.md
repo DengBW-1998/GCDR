@@ -22,4 +22,4 @@ If you want to run GCDR or LightGCL:
 - python main.py
 
 If you want to run other baselines:
-- python Baseline.py
+- python Baseline_main.py

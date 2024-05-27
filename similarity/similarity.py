@@ -8,12 +8,9 @@ import scipy.sparse as sp
 
 
 def GCNSimDefense(emb0_u, emb0_v, u, v, Bu, thx=2.326, thj=0.05, simFunc='jac'):
-    # simFunc ['jac','cos','prs','ham']
     n = u + v
     adj = np.zeros((n, n))
     Bu = np.array(Bu.todense())
-    #print(2*sum(sum(Bu)))
-
     if simFunc == 'jac' or simFunc == 'ham':
         avg = np.average(emb0_u)
         s = np.std(emb0_u)
@@ -55,8 +52,6 @@ def cosSim(X, Y):
 
 
 def prsSim(X, Y):
-    if Y.shape[0] != 128:
-        return 0
     n = len(X)
     sum1 = sum(X)
     sum2 = sum(Y)
@@ -65,16 +60,13 @@ def prsSim(X, Y):
     p_sum = sum(np.multiply(X, Y))
     num = p_sum - (sum1 * sum2 / n)
     den = math.sqrt((sum1_pow - pow(sum1, 2) / n) * (sum2_pow - pow(sum2, 2) / n))
-    if den == 0:
-        return 0.0
+    if den==0:
+        return 0
     return num / den
 
 
 def hamSim(s1, s2):
-    if (s2.shape[0] != 128):
-        res = 0
-    else:
-        res = sum(s1_ == s2_ for s1_, s2_ in zip(s1, s2)) / len(s1)
+    res = sum(s1_ == s2_ for s1_, s2_ in zip(s1, s2)) / len(s1)
     return res
 
 

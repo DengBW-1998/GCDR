@@ -115,6 +115,23 @@ def augmentation(adj_matrix, n_candidates, u, v, seed=0):
     candidates = candidates[:n_candidates]
     return candidates
 
+def flip_Bu_candidates(adj_matrix, candidates):
+    """
+    :param adj_matrix: sp.csr_matrix, shape [n_nodes, n_nodes]
+        Adjacency matrix of the graph
+    :param candidates: np.ndarray, shape [?, 2]
+        Candidate set of edge flips
+    :return: sp.csr_matrix, shape [n_nodes, n_nodes]
+        Adjacency matrix of the graph with the flipped edges/non-edges.
+    """
+    adj_matrix_flipped = adj_matrix.copy().tolil()
+    adj_matrix_flipped[candidates[:, 0], candidates[:, 1]] = 1 - adj_matrix[candidates[:, 0], candidates[:, 1]]
+    #adj_matrix_flipped[candidates[:, 1], candidates[:, 0]] = 1 - adj_matrix[candidates[:, 1], candidates[:, 0]]
+    adj_matrix_flipped = adj_matrix_flipped.tocsr()
+    adj_matrix_flipped.eliminate_zeros()
+
+    return adj_matrix_flipped
+    
 class TrnData(data.Dataset):
     def __init__(self, coomat):
         self.rows = coomat.row #每一个交互对应的用户

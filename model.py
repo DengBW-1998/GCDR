@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 from utils import sparse_dropout, spmm
 import torch.nn.functional as F
+import scipy.sparse as sp
+import numpy as np
 
 class LightGCL(nn.Module):
     def __init__(self, n_u, n_i, d, u_mul_s, v_mul_s, ut, vt, train_csr, adj_norm, l, temp, lambda_1, lambda_2, dropout, batch_user, device, Eu=None, Ei=None):
@@ -149,3 +151,81 @@ class LightGCL(nn.Module):
             loss = loss_r + self.lambda_1 * loss_s + loss_reg
             #print('loss',loss.item(),'loss_r',loss_r.item(),'loss_s',loss_s.item())
             return loss, loss_r, self.lambda_1 * loss_s
+
+def dropedge_dis(A, iA, jA, features, threshold):
+    removed_cnt = 0
+    for row in range(len(iA)-1):
+        for i in range(iA[row], iA[row+1]):
+            # print(row, jA[i], A[i])
+            n1 = row
+            n2 = jA[i]
+            C = np.linalg.norm(features[n1] - features[n2])
+            if C > threshold:
+                A[i] = 0
+                # A[n2, n1] = 0
+                removed_cnt += 1
+
+    return removed_cnt
+
+def dropedge_jaccard(A, iA, jA, features, threshold):
+    removed_cnt = 0
+    for row in range(len(iA)-1):
+        for i in range(iA[row], iA[row+1]):
+            # print(row, jA[i], A[i])
+            n1 = row
+            n2 = jA[i]
+            a, b = features[n1], features[n2]
+            intersection = np.count_nonzero(a*b)
+            J = intersection * 1.0 / (np.count_nonzero(a) + np.count_nonzero(b) - intersection)
+
+            if J < threshold:
+                A[i] = 0
+                # A[n2, n1] = 0
+                removed_cnt += 1
+    return removed_cnt
+
+
+def dropedge_cosine(A, iA, jA, features, threshold):
+    removed_cnt = 0
+    for row in range(len(iA)-1):
+        for i in range(iA[row], iA[row+1]):
+            # print(row, jA[i], A[i])
+            n1 = row
+            n2 = jA[i]
+            a, b = features[n1], features[n2]
+            inner_product = (a * b).sum()
+            C = inner_product / (np.sqrt(np.square(a).sum()) * np.sqrt(np.square(b).sum()) + 1e-8)
+            if C <= threshold:
+                A[i] = 0
+                removed_cnt += 1
+    return removed_cnt
+
+def stable(features, Bu,u,v, metric='sim', threshold=0.05, jaccard=False):
+    """Drop dissimilar edges.(Faster version using numba)
+    """
+    n = u + v
+    adj = np.zeros((n, n))
+    Bu = np.array(Bu.todense())
+    # print(Bu)
+    adj[:u, u:] = Bu
+    adj[u:, :u] = Bu.T
+
+    if not sp.issparse(adj):
+        adj = sp.csr_matrix(adj)
+
+    adj_triu = sp.triu(adj, format='csr')
+
+    if sp.issparse(features):
+        features = features.todense().A  # make it easier for njit processing
+
+    if metric == 'distance':
+        removed_cnt = dropedge_dis(adj_triu.data, adj_triu.indptr, adj_triu.indices, features, threshold=threshold)
+    else:
+        if jaccard:
+            removed_cnt = dropedge_jaccard(adj_triu.data, adj_triu.indptr, adj_triu.indices, features,
+                                           threshold=threshold)
+        else:
+            removed_cnt = dropedge_cosine(adj_triu.data, adj_triu.indptr, adj_triu.indices, features,
+                                          threshold=threshold)
+    modified_adj = adj_triu + adj_triu.transpose()
+    return modified_adj

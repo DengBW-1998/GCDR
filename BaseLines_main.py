@@ -11,12 +11,14 @@ from attacks.Heuristic_Attack import Heuristic_Attack
 import scipy.sparse as sp
 import pandas as pd
 import random
+from model import stable
+from ProGNN.train import pro_GNN_Hyper,proGNNTrain
 
 flip_rate=20/100
 
 model = 'LightGCN' #LightGCN SGL SimGCL XSimGCL
 attack='HA' #no rnd DICE HA
-dataset = 'amazon' #yelp gowalla amazon
+dataset = 'yelp' #yelp gowalla amazon
 
 if dataset=='yelp':
     u=11840
@@ -30,6 +32,7 @@ if dataset=='amazon':
     u=7858
     v=7780 #125592 35633
     n_flips = int(125592 * flip_rate)
+
 n_candidates = 10*n_flips
 
 device = 'cuda:0'
